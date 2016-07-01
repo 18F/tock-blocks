@@ -5,6 +5,7 @@ A simple command line tool to see what your main projects were in 5 percentage p
 ## Installation
 ```
 git clone https://github.com/18F/tock-blocks.git
+
 cd tock-blocks
 ```
 
@@ -19,9 +20,13 @@ It will then print out an array of your major blocks of projects (rounded to the
 
 ### Optional Parameters
 `-u` user: the user you would like to find tock entries for. Coming soon multiple user search.
+
 `-f` file: The tock file csv you would like to use. This will default to `timecards_bulk.csv`.
+
 `-s` start date: The date that you would like to look at tock entries beginning after this date.
+
 `-e` end date: The date that you would like to look at tock entries ending before this date.
+
 `-v` verbose: Prints additional debugging information to the command line.
 
 ## Public domain
