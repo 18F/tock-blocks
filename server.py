@@ -83,7 +83,7 @@ def blockify_projects(perc_dict):
     for project in perc_dict:
         proj_block = {}
         proj_block[project] = perc_dict[project]
-        if perc_dict[project] > 20.0:
+        if perc_dict[project] >= 20.0:
             blocks.append(proj_block)
         elif perc_dict[project] > 0:
             other['Other'].append(proj_block)
