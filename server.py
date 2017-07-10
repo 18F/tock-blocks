@@ -148,13 +148,14 @@ def main():
 
 
     args = parser.parse_args()
-    print(args.users)
     time_entries = read_CSV_to_list(args.file)
     if(args.verbose):
         print("Printing Length and CSV Headers")
         print(len(time_entries))
         print(time_entries[0])
         print(time_entries[1])
+    if(args.pretty):
+        print("Tock data from"+args.start_date + " to "+args.end_date)
     block_by_array(args.users, time_entries, args.start_date, args.end_date, args.pretty)
 
 if __name__ == "__main__":
