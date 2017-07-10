@@ -93,14 +93,17 @@ def blockify_projects(perc_dict):
 # Function for an array of person
 def block_by_array(users, entries, start, end):
     for u in users:
+        print(u)
         print (block_for_one_person(start, end, u, entries))
 
 # TODO parse arg for handling for multiple users
 def main():
     parser = argparse.ArgumentParser(description='Calculate a users major time blocks')
-    parser.add_argument('-u', action='store', default='darren.divens',
-                        dest='user',
-                        help='user to search block')
+    parser.add_argument('-u','--users', nargs='+',
+                        help='user or users list',
+                        required=True,
+                        default='darren.divens',
+                        dest='users')
     parser.add_argument('-f', action='store', default='timecards_bulk.csv',
                         dest='file',
                         help='The csv file for the tock entries')
@@ -116,13 +119,14 @@ def main():
 
 
     args = parser.parse_args()
+    print(args.users)
     time_entries = read_CSV_to_list(args.file)
     if(args.verbose):
         print("Printing Length and CSV Headers")
         print(len(time_entries))
         print(time_entries[0])
         print(time_entries[1])
-    block_by_array([args.user], time_entries, args.start_date, args.end_date)
+    block_by_array(args.users, time_entries, args.start_date, args.end_date)
 
 if __name__ == "__main__":
     main()

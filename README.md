@@ -9,7 +9,7 @@ git clone https://github.com/18F/tock-blocks.git
 cd tock-blocks
 ```
 
-Download `https://tock.18f.gov/api/timecards_bulk.csv` to your `tock-blocks` directory
+Download the Raw data in .csv from `https://tock.18f.gov/reports/` to your `tock-blocks` directory
 It is easiest to do this in browser, because otherwise you will have to authenticate into tock.
 
 ## Run the tock blocks
@@ -19,7 +19,7 @@ It is easiest to do this in browser, because otherwise you will have to authenti
 It will then print out an array of your major blocks of projects (rounded to the nearest 5%), as well of a list of other projects that are greater than 2.5% of your time.
 
 ### Optional Parameters
-`-u` user: the user you would like to find tock entries for. Coming soon multiple user search.
+`-u` users: the user or users you would like to find tock entries for.
 
 `-f` file: The tock file csv you would like to use. This will default to `timecards_bulk.csv`.
 
