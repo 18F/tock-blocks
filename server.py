@@ -90,13 +90,39 @@ def blockify_projects(perc_dict):
     blocks.append(other)
     return blocks
 
-# Function for an array of person
-def block_by_array(users, entries, start, end):
-    for u in users:
-        print(u)
-        print (block_for_one_person(start, end, u, entries))
+class color:
+   PURPLE = '\033[95m'
+   CYAN = '\033[96m'
+   DARKCYAN = '\033[36m'
+   BLUE = '\033[94m'
+   GREEN = '\033[92m'
+   YELLOW = '\033[93m'
+   RED = '\033[91m'
+   BOLD = '\033[1m'
+   UNDERLINE = '\033[4m'
+   END = '\033[0m'
 
-# TODO parse arg for handling for multiple users
+# Function for an array of person
+def block_by_array(users, entries, start, end, nice_display):
+    for u in users:
+        print(color.PURPLE+u+color.END)
+        if (nice_display):
+            user_block = block_for_one_person(start, end, u, entries)
+            print_nice(user_block)
+        else:
+            print (block_for_one_person(start, end, u, entries))
+
+def print_nice(user_block_list):
+    for activity in user_block_list:
+        for i in activity:
+            if (i == 'Other'):
+                print(color.BOLD+'Other'+color.END)
+                for oth in activity[i]:
+                    print(oth)
+            else:
+                print(i, activity[i])
+    print("\n")
+
 def main():
     parser = argparse.ArgumentParser(description='Calculate a users major time blocks')
     parser.add_argument('-u','--users', nargs='+',
@@ -116,6 +142,9 @@ def main():
     parser.add_argument('-v', action='store_true', default=False,
                         dest='verbose',
                         help='print out csv headers')
+    parser.add_argument('-p', '--pretty', action='store_true', default=True,
+                        dest='pretty',
+                        help='display in a pretty format')
 
 
     args = parser.parse_args()
@@ -126,7 +155,7 @@ def main():
         print(len(time_entries))
         print(time_entries[0])
         print(time_entries[1])
-    block_by_array(args.users, time_entries, args.start_date, args.end_date)
+    block_by_array(args.users, time_entries, args.start_date, args.end_date, args.pretty)
 
 if __name__ == "__main__":
     main()
