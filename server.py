@@ -138,8 +138,12 @@ def print_nice(user_block_list, nice_display):
                 print_handler('Other', nice_display, 'bold')
                 for oth in activity[i]:
                     print(oth)
+                    if(nice_display == 'markdown'):
+                        print("\n")
             else:
                 print(i, activity[i])
+                if(nice_display == 'markdown'):
+                    print("\n")
     print("\n")
 
 def print_handler(text, nice_display, level):
