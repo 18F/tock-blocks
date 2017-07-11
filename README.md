@@ -29,7 +29,7 @@ It will then print out an array of your major blocks of projects (rounded to the
 
 `-v` verbose: Prints additional debugging information to the command line.
 
-'-p' pretty: Defaulted to on, will display a nice output to standard out.
+'-d' display format: Display in a readable format or into markdown
 
 '-l' exclude leave: remove holidays, annual and award leave from the report
 
