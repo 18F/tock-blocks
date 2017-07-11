@@ -14,14 +14,33 @@ def read_CSV_to_list(csv_file):
 # TODO convert to api pull
 
 # Function for one person
-def block_for_one_person(start, end, username, time_entries):
+def block_for_one_person(start, end, username, time_entries, exclude_leave):
     user_entries = get_user_entries(username, time_entries)
     time_period_entries = get_entries_in_time_period(start, end, user_entries)
+    if(exclude_leave):
+        time_period_entries = remove_leave(time_period_entries)
     project_dict = create_project_dict(time_period_entries)
     total_hours = reduce_dict_to_hours(project_dict)
     perc_dict = calculate_projects_percentage(project_dict, total_hours)
     blocks = blockify_projects(perc_dict)
     return blocks
+
+leave_types = ['Out of Office - Sick Leave',
+ 'Out of Office - Administrative/Holiday Leave',
+ 'Out of Office - Annual Leave', 'Out of Office - Award Time',
+ 'Out of Office - Compensatory Time',
+ 'Out of Office - Court Leave (Jury Duty)',
+ 'Out of Office - Donated Leave',
+ 'Out of Office - Leave Without Pay',
+ 'Out of Office - Other'
+ ]
+
+def remove_leave(entries):
+    filtered_entries = []
+    for entry in entries:
+        if (entry[0] not in leave_types):
+            filtered_entries.append(entry)
+    return filtered_entries
 
 # Filter By User
 def get_user_entries(username, entries):
@@ -103,14 +122,14 @@ class color:
    END = '\033[0m'
 
 # Function for an array of person
-def block_by_array(users, entries, start, end, nice_display):
+def block_by_array(users, entries, start, end, nice_display, exclude_leave):
     for u in users:
         print(color.PURPLE+u+color.END)
         if (nice_display):
-            user_block = block_for_one_person(start, end, u, entries)
+            user_block = block_for_one_person(start, end, u, entries, exclude_leave)
             print_nice(user_block)
         else:
-            print (block_for_one_person(start, end, u, entries))
+            print (block_for_one_person(start, end, u, entries, exclude_leave))
 
 def print_nice(user_block_list):
     for activity in user_block_list:
@@ -145,6 +164,10 @@ def main():
     parser.add_argument('-p', '--pretty', action='store_true', default=True,
                         dest='pretty',
                         help='display in a pretty format')
+    parser.add_argument('-l','--exclude-leave', action='store_true',
+                        default=False,
+                        dest='exclude_leave',
+                        help='exclude annual leave and holidays from the report')
 
 
     args = parser.parse_args()
@@ -155,8 +178,8 @@ def main():
         print(time_entries[0])
         print(time_entries[1])
     if(args.pretty):
-        print("Tock data from"+args.start_date + " to "+args.end_date)
-    block_by_array(args.users, time_entries, args.start_date, args.end_date, args.pretty)
+        print("Tock data from "+args.start_date + " to "+args.end_date)
+    block_by_array(args.users, time_entries, args.start_date, args.end_date, args.pretty, args.exclude_leave)
 
 if __name__ == "__main__":
     main()
