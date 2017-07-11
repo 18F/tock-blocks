@@ -124,23 +124,34 @@ class color:
 # Function for an array of person
 def block_by_array(users, entries, start, end, nice_display, exclude_leave):
     for u in users:
-        print(color.PURPLE+u+color.END)
+        print_handler(u, nice_display, 'header')
         if (nice_display):
             user_block = block_for_one_person(start, end, u, entries, exclude_leave)
-            print_nice(user_block)
+            print_nice(user_block, nice_display)
         else:
             print (block_for_one_person(start, end, u, entries, exclude_leave))
 
-def print_nice(user_block_list):
+def print_nice(user_block_list, nice_display):
     for activity in user_block_list:
         for i in activity:
             if (i == 'Other'):
-                print(color.BOLD+'Other'+color.END)
+                print_handler('Other', nice_display, 'bold')
                 for oth in activity[i]:
                     print(oth)
             else:
                 print(i, activity[i])
     print("\n")
+
+def print_handler(text, nice_display, level):
+    if(nice_display == 'pretty'):
+        if(level == 'bold'):
+            return print(color.BOLD+'Other'+color.END)
+        return print(color.PURPLE+text+color.END)
+    if(nice_display == 'markdown'):
+        if (level == 'bold'):
+            return print('*'+text+'*')
+        return print('## '+text)
+    return print(text)
 
 def main():
     parser = argparse.ArgumentParser(description='Calculate a users major time blocks')
@@ -161,9 +172,9 @@ def main():
     parser.add_argument('-v', action='store_true', default=False,
                         dest='verbose',
                         help='print out csv headers')
-    parser.add_argument('-p', '--pretty', action='store_true', default=True,
-                        dest='pretty',
-                        help='display in a pretty format')
+    parser.add_argument('-d', '--display_format',
+                        dest='display_format',
+                        help='print display in pretty colors on standard out, or in markdown')
     parser.add_argument('-l','--exclude-leave', action='store_true',
                         default=False,
                         dest='exclude_leave',
@@ -177,9 +188,11 @@ def main():
         print(len(time_entries))
         print(time_entries[0])
         print(time_entries[1])
-    if(args.pretty):
+    if(args.display_format == 'pretty'):
         print("Tock data from "+args.start_date + " to "+args.end_date)
-    block_by_array(args.users, time_entries, args.start_date, args.end_date, args.pretty, args.exclude_leave)
+    if(args.display_format == 'markdown'):
+        print("# Tock data from "+args.start_date + " to "+args.end_date)
+    block_by_array(args.users, time_entries, args.start_date, args.end_date, args.display_format, args.exclude_leave)
 
 if __name__ == "__main__":
     main()
