@@ -79,12 +79,12 @@ def calculate_projects_percentage(projects, total_hours):
     percentage_projects = {}
     if total_hours > 0:
         for p in projects:
-            percentage_projects[p] = myround(projects[p]/total_hours*100)
+            percentage_projects[p] = myRound(projects[p]/total_hours*100)
         return percentage_projects
     else:
         return projects
 
-def myround(x, base=5):
+def myRound(x, base=5):
     return int(base * round(float(x)/base))
 
 # Reduce Project dict to total hours

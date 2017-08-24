@@ -1,12 +1,13 @@
 import argparse
 import tock_blocks
+import utilization_summary
 
 def main():
     parser = argparse.ArgumentParser(description='Calculate a users major time blocks')
     parser.add_argument('-p','--program',
                         help='choose between tock blocks and the full user program.',
                         default='tock-blocks',
-                        dest='users')
+                        dest='program')
     parser.add_argument('-u','--users', nargs='+',
                         help='user or users list',
                         required=True,
@@ -31,6 +32,10 @@ def main():
                         default=False,
                         dest='exclude_leave',
                         help='exclude annual leave and holidays from the report')
+    parser.add_argument('-o','--outfile',
+                        default='outfile.csv',
+                        dest='outfile',
+                        help='outfile for util summary')
 
 
     args = parser.parse_args()
@@ -44,7 +49,10 @@ def main():
         print("Tock data from "+args.start_date + " to "+args.end_date)
     if(args.display_format == 'markdown'):
         print("# Tock data from "+args.start_date + " to "+args.end_date)
-    tock_blocks.block_by_array(args.users, time_entries, args.start_date, args.end_date, args.display_format, args.exclude_leave)
+    if (args.program == 'tock-blocks'):
+        tock_blocks.block_by_array(args.users, time_entries, args.start_date, args.end_date, args.display_format, args.exclude_leave)
+    elif (args.program == 'util-csv'):
+        utilization_summary.all_users_from_file("users.csv", args, [1,8])
 
 if __name__ == "__main__":
     main()
