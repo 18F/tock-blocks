@@ -10,19 +10,18 @@ def all_users_from_file(userfile, args, months):
     for user in users:
         user_list[arr_ind] = users[arr_ind] + util_csv(user[0], months, time_entries)
         arr_ind +=1
-    print(user_list)
     with open(args.outfile, 'a') as outcsv:
         #configure writer to write standard csv file
         writer = csv.writer(outcsv, delimiter=',', quotechar='|', quoting=csv.QUOTE_MINIMAL, lineterminator='\n')
-        writer.writerow(['name', 'position', 'team']+list(range(months[0],months[1])))
+        writer.writerow(['Name', 'Position', 'Team', 'Project type']+list(range(months[0],months[1])))
         for item in user_list:
             #Write item to outcsv
             billable_list= [i[0] for i in item[3:]]
             internal_list= [i[1] for i in item[3:]]
             util_list= [i[2] for i in item[3:]]
-            toprow = [item[0], item[1], item[2], 'billable']+billable_list
-            middlelist= ['', '', '', 'internal projects'] + internal_list
-            bottom= ['', '', '', 'utilization percentage'] + util_list
+            toprow = [item[0], item[1], item[2], 'Billable']+billable_list
+            middlelist= ['', '', '', 'Internal projects'] + internal_list
+            bottom= ['', '', '', 'Utilization percentage'] + util_list
             writer.writerow(toprow)
             writer.writerow(middlelist)
             writer.writerow(bottom)
@@ -59,9 +58,6 @@ def util_csv(user, months, time_entries):
         user_values[array_ind]=[billable_perc,internal_perc, utilizable_perc]
         array_ind += 1
     return user_values
-    # create an array
-    # concat to csv
-    # print csv
 
 
 #TODO convert to lamdas
