@@ -14,16 +14,17 @@ def all_users_from_file(userfile, args, months):
         #configure writer to write standard csv file
         writer = csv.writer(outcsv, delimiter=',', quotechar='|', quoting=csv.QUOTE_MINIMAL, lineterminator='\n')
         month_name_list = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"]
-        header_row = ['Name', 'Position', 'Team', 'Project type']+month_name_list[(months[0]-1): months[1]-1]
+        header_row = ['Name', 'Position', 'Team', 'Project type']+month_name_list[(months[0]-1): months[1]-1]+['Average']
         writer.writerow(header_row )
         for item in user_list:
             #Write item to outcsv
-            billable_list= [i[0] for i in item[3:]]
-            internal_list= [i[1] for i in item[3:]]
-            util_list= [i[2] for i in item[3:]]
-            toprow = [item[0], item[1], item[2], 'Billable']+billable_list
-            middlelist= ['', '', '', 'Internal projects'] + internal_list
-            bottom= ['', '', '', 'Utilization percentage'] + util_list
+            # billable_list= [i[0] for i in item[3:]]
+            # avg_billable = mean(billable_list)
+            # internal_list= [i[1] for i in item[3:]]
+            # util_list= [i[2] for i in item[3:]]
+            toprow = [item[0], item[1], item[2], 'Billable']+monthly_and_average(item, 0)
+            middlelist= ['', '', '', 'Internal projects'] + monthly_and_average(item, 1)
+            bottom= ['', '', '', 'Utilization percentage'] + monthly_and_average(item, 2)
             writer.writerow(toprow)
             writer.writerow(middlelist)
             writer.writerow(bottom)
@@ -92,3 +93,11 @@ def calc_total_hours(entries):
     for entry in entries:
         total_hours = total_hours + float(entry[5])
     return total_hours
+
+def monthly_and_average(user_list_row, sub_array_ind):
+    filtered_list = [i[sub_array_ind] for i in user_list_row[3:]]
+    filtered_list.append(round(mean(filtered_list), 1))
+    return filtered_list
+
+def mean(numbers):
+    return float(sum(numbers)) / max(len(numbers), 1)
