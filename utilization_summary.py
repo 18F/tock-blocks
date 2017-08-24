@@ -10,10 +10,12 @@ def all_users_from_file(userfile, args, months):
     for user in users:
         user_list[arr_ind] = users[arr_ind] + util_csv(user[0], months, time_entries)
         arr_ind +=1
-    with open(args.outfile, 'a') as outcsv:
+    with open(args.outfile, 'w') as outcsv:
         #configure writer to write standard csv file
         writer = csv.writer(outcsv, delimiter=',', quotechar='|', quoting=csv.QUOTE_MINIMAL, lineterminator='\n')
-        writer.writerow(['Name', 'Position', 'Team', 'Project type']+list(range(months[0],months[1])))
+        month_name_list = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"]
+        header_row = ['Name', 'Position', 'Team', 'Project type']+month_name_list[(months[0]-1): months[1]-1]
+        writer.writerow(header_row )
         for item in user_list:
             #Write item to outcsv
             billable_list= [i[0] for i in item[3:]]
