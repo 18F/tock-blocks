@@ -1,5 +1,6 @@
 import tock_blocks
 import csv
+from dateutil.parser import parse as date_parse
 
 
 def all_users_from_file(userfile, args, months):
@@ -17,11 +18,6 @@ def all_users_from_file(userfile, args, months):
         header_row = ['Name', 'Position', 'Team', 'Project type']+month_name_list[(months[0]-1): months[1]-1]+['Average']
         writer.writerow(header_row )
         for item in user_list:
-            #Write item to outcsv
-            # billable_list= [i[0] for i in item[3:]]
-            # avg_billable = mean(billable_list)
-            # internal_list= [i[1] for i in item[3:]]
-            # util_list= [i[2] for i in item[3:]]
             toprow = [item[0], item[1], item[2], 'Billable']+monthly_and_average(item, 0)
             middlelist= ['', '', '', 'Internal projects'] + monthly_and_average(item, 1)
             bottom= ['', '', '', 'Utilization percentage'] + monthly_and_average(item, 2)
@@ -48,7 +44,8 @@ def util_csv(user, months, time_entries):
         else:
             mStart = str(x)
             mEnd = str(x+1)
-        month_time_entries = tock_blocks.get_entries_in_time_period("2017-"+mStart+"-01", "2017-"+mEnd+"-01", user_entries)
+        print("mStart: "+mStart)
+        month_time_entries = tock_blocks.get_entries_in_time_period("2017-"+mStart+"-01", "2017-"+mEnd+"-01", user_entries, 'util')
         billable_hours = calc_billable_hours(month_time_entries)
         internal_hours = calc_internal_hours(month_time_entries)
         total_hours = calc_total_hours(month_time_entries)
@@ -83,7 +80,9 @@ def calc_billable_hours(entries):
 
 def calc_internal_hours(entries):
     internal_hours = 0.0
+    # print("entries: "+entries[0][4])
     for entry in entries:
+
         if(entry[0][:22] == "TTS Acq / Internal Acq" and entry[6]== "False"):
             internal_hours = internal_hours + float(entry[5])
     return internal_hours
