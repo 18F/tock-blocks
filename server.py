@@ -10,7 +10,6 @@ def main():
                         dest='program')
     parser.add_argument('-u','--users', nargs='+',
                         help='user or users list',
-                        required=True,
                         default='darren.divens',
                         dest='users')
     parser.add_argument('-f', action='store', default='timecards_bulk.csv',
