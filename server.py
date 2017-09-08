@@ -51,7 +51,7 @@ def main():
     if (args.program == 'tock-blocks'):
         tock_blocks.block_by_array(args.users, time_entries, args.start_date, args.end_date, args.display_format, args.exclude_leave)
     elif (args.program == 'util-csv'):
-        utilization_summary.all_users_from_file("users.csv", args, [1,8])
+        utilization_summary.all_users_from_file("users.csv", args, [1,9])
 
 if __name__ == "__main__":
     main()
