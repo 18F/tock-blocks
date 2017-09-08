@@ -1,6 +1,6 @@
 # About Tock blocks
 
-A simple command line tool to see what your main projects were in 5 percentage point increments
+A simple command line tool to see what your main projects were in 5 percentage point increments. The program also allows you to create a csv spreadsheet of users' monthly utilization using the `util-csv` feature.
 
 ## Installation
 ```
