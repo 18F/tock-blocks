@@ -44,7 +44,7 @@ def util_csv(user, months, time_entries):
         else:
             mStart = str(x)
             mEnd = str(x+1)
-        print("mStart: "+mStart)
+        # print("mStart: "+mStart)
         month_time_entries = tock_blocks.get_entries_in_time_period("2017-"+mStart+"-01", "2017-"+mEnd+"-01", user_entries, 'util')
         billable_hours = calc_billable_hours(month_time_entries)
         internal_hours = calc_internal_hours(month_time_entries)
