@@ -17,6 +17,19 @@ It is easiest to do this in browser, because otherwise you will have to authenti
 `python server.py -u firstName.lastName -s YYYY-MM-DD -e YYYY-MM-DD`
 
 It will then print out an array of your major blocks of projects (rounded to the nearest 5%), as well of a list of other projects that are greater than 2.5% of your time.
+### Running the Regular Utilization Report
+1. Follow the download instructions from above using the "complete timecard data with fewer fields" button on the Tock report (if you have excel downloaded, don't save the file as because that will change the csv format and break tock-blocks).
+2. `cd tock-blocks`
+3. Make sure it is running in Python 3. Verify by checking `pyenv local`
+4. Running the command ` python server.py -p util-csv -f slim_timecard_bulk.csv `
+5. Upload file to google drive, outfile.csv.
+6. Make sure to add a column to the right of the last month in the existing google utilization sheet. It needs to be to the right to maintain the formatting of months rather than the average column.
+7. Copy and paste from outfile.csv to existing Acqstack utilization file.
+
+
+
+
+
 
 ### Optional Parameters
 `-u` users: the user or users you would like to find tock entries for.
