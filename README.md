@@ -21,7 +21,7 @@ It will then print out an array of your major blocks of projects (rounded to the
 1. Follow the download instructions from above using the "complete timecard data with fewer fields" button on the Tock report (if you have excel downloaded, don't save the file as because that will change the csv format and break tock-blocks).
 2. `cd tock-blocks`
 3. Make sure it is running in Python 3. Verify by checking `pyenv local`
-4. Running the command ` python server.py -p util-csv -f slim_timecard_bulk.csv `
+4. Running the command ` python server.py -p util-csv -f slim_timecard_bulk.csv -b <Beginning month> -l <Last Month>`. Months must be the full name with capitalization i.e "September" or "July".
 5. Upload file to google drive, outfile.csv.
 6. Make sure to add a column to the right of the last month in the existing google utilization sheet. It needs to be to the right to maintain the formatting of months rather than the average column.
 7. Copy and paste from outfile.csv to existing Acqstack utilization file.
@@ -42,9 +42,15 @@ It will then print out an array of your major blocks of projects (rounded to the
 
 `-v` verbose: Prints additional debugging information to the command line.
 
-'-d' display format: Display in a readable format or into markdown
+`-d` display format: Display in a readable format or into markdown
 
-'-l' exclude leave: remove holidays, annual and award leave from the report
+`-n` no leave: remove holidays, annual and award leave from the report
+
+`-b` begin month, for the utilization summary: which month to start at
+
+`-l` last month: the final month for the utilization summary
+
+
 
 ## Public domain
 

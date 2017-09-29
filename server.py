@@ -27,7 +27,7 @@ def main():
     parser.add_argument('-d', '--display_format',
                         dest='display_format',
                         help='print display in pretty colors on standard out, or in markdown')
-    parser.add_argument('-l','--exclude-leave', action='store_true',
+    parser.add_argument('-n','--no-leave', action='store_true',
                         default=False,
                         dest='exclude_leave',
                         help='exclude annual leave and holidays from the report')
@@ -35,6 +35,12 @@ def main():
                         default='outfile.csv',
                         dest='outfile',
                         help='outfile for util summary')
+    parser.add_argument('-b','--beginmonth',
+                        dest='beginmonth',
+                        help='starting month for the utilization summary')
+    parser.add_argument('-l','--lastmonth',
+                        dest='lastmonth',
+                        help='last or ending month for the utilization summary')
 
 
     args = parser.parse_args()
@@ -51,7 +57,7 @@ def main():
     if (args.program == 'tock-blocks'):
         tock_blocks.block_by_array(args.users, time_entries, args.start_date, args.end_date, args.display_format, args.exclude_leave)
     elif (args.program == 'util-csv'):
-        utilization_summary.all_users_from_file("users.csv", args, [1,10])
+        utilization_summary.all_users_from_file("users.csv", args)
 
 
 if __name__ == "__main__":
