@@ -15,7 +15,7 @@ def read_CSV_to_list(csv_file):
 # Function for one person
 def block_for_one_person(start, end, username, time_entries, exclude_leave):
     user_entries = get_user_entries(username, time_entries)
-    time_period_entries = get_entries_in_time_period(start, end, user_entries, 'tb')
+    time_period_entries = get_entries_in_month(start, user_entries)
     if(exclude_leave):
         time_period_entries = remove_leave(time_period_entries)
     project_dict = create_project_dict(time_period_entries)
@@ -51,19 +51,12 @@ def get_user_entries(username, entries):
 
 # Filter By time
 #TODO Filter by time
-def get_entries_in_time_period(start, end, entries, program):
+def get_entries_in_month(month_to_check, entries):
     time_periods_entries = []
-    start_date = date_parse(start)
-    end_date = date_parse(end)
+    month_as_date = date_parse(month_to_check)
     for entry in entries:
         entry_start = date_parse(entry[3])
-        start_diff = (entry_start-start_date).days
-        if (program == 'tb'):
-            entry_end = date_parse(entry[4])
-            end_diff = (entry_end-end_date).days
-        else:
-            end_diff = (entry_start-end_date).days
-        if(start_diff >= 0 and end_diff <= 0):
+        if month_as_date.month == entry_start.month and month_as_date.year == entry_start.year:
             time_periods_entries.append(entry)
     return time_periods_entries
 
