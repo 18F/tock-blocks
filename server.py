@@ -12,7 +12,7 @@ def main():
                         help='user or users list',
                         default='darren.divens',
                         dest='users')
-    parser.add_argument('-f', action='store', default='timecards_bulk.csv',
+    parser.add_argument('-f', action='store',
                         dest='file',
                         help='The csv file for the tock entries')
     parser.add_argument('-s', action='store', default='2016-01-01',
@@ -44,7 +44,6 @@ def main():
 
 
     args = parser.parse_args()
-    time_entries = tock_blocks.read_CSV_to_list(args.file)
     if(args.verbose):
         print("Printing Length and CSV Headers")
         print(len(time_entries))
@@ -55,7 +54,7 @@ def main():
             print("Tock data from "+args.start_date + " to "+args.end_date)
         if(args.display_format == 'markdown'):
             print("# Tock data from "+args.start_date + " to "+args.end_date)
-        tock_blocks.block_by_array(args.users, time_entries, args.start_date, args.end_date, args.display_format, args.exclude_leave)
+        tock_blocks.block_by_array(args.users, args.start_date, args.end_date, args.display_format, args.exclude_leave)
     elif (args.program == 'util-csv'):
         utilization_summary.all_users_from_file("users.csv", args)
 

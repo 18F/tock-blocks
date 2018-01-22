@@ -23,9 +23,15 @@ class color:
    END = '\033[0m'
 
 def all_users_from_file(userfile, args):
-    print(color.PURPLE+"TOCK BLOCKS:"+color.END+" Generating the utilization report from the data in "+args.file+".")
-    time_entries = get_data_from_tock()
+    data_source = 'api'
+    if args.file is not None:
+        data_source = args.file
+    print("{}TOCK BLOCKS:{} Generating the utilization report from the data in {}.".format(color.PURPLE, color.END, data_source))
     users = tock_blocks.read_CSV_to_list(userfile)
+    if args.file is not None:
+        time_entries = tock_blocks.read_CSV_to_list(args.file)
+    else:
+        time_entries = get_data_from_tock()
     today = datetime.date.today()
     months = find_months(today, args)
     user_list = [0] * len(users)
@@ -35,7 +41,6 @@ def all_users_from_file(userfile, args):
     print(color.PURPLE+"TOCK BLOCKS:"+color.END+" Completed generating the utilization summary. Please view the report in the file "+ args.outfile +".")
 
 def find_months(today, args):
-    print(args)
     months = [0,0]
     if args.beginmonth is None:
         months[0] = today.month - 2
@@ -59,10 +64,8 @@ def utilization_calculator(user, months, time_entries, today):
         mStart = calculateMonthYear(x, today)
         month_time_entries = tock_blocks.get_entries_in_month(mStart+"-01", user_entries)
         billable_hours = calc_billable_hours(month_time_entries)
-        # print('{} billable_hours {}'.format(user, billable_hours))
         internal_hours = calc_internal_hours(month_time_entries)
         total_hours = calc_total_hours(month_time_entries)
-        print('{} total_hours {}'.format(user, total_hours))
         billable_percent = 0.0
         internal_percent = 0.0
         if (total_hours > 0):
@@ -133,7 +136,7 @@ def mean(numbers):
 
 def get_data_from_tock():
     print(color.PURPLE+"TOCK BLOCKS:"+color.END+' Downloading data from tock! This is a big file. It could take several minutes.')
-    url = 'https://tock.18f.gov/api/timecards.json?after=2017-01-01'
+    url = 'https://tock.18f.gov/api/timecards.json?after=2017-10-01'
     headers = {}
     headers['Authorization'] = 'token %s' % TOCK_API_KEY
 
@@ -154,9 +157,6 @@ def write_output(args, user_list, months):
         header_row = ['Name', 'Position', 'Team', 'Project type']+months_to_print+['Average for last quarter']
         writer.writerow(header_row)
         for item in user_list:
-            if(item[0] == 'victoria.mcfadden' or item[0] == 'ashley.owens' or item[0] == 'hassan.harris'):
-                print(item[0])
-                print(item)
             toprow = [item[0], item[1], item[2], 'Billable']+monthly_and_average(item, 0)
             middlelist= ['', '', '', 'Internal projects'] + monthly_and_average(item, 1)
             bottom= ['', '', '', 'Utilization percentage'] + monthly_and_average(item, 2)
