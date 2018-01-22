@@ -30,6 +30,7 @@ def all_users_from_file(userfile, args):
     print(color.PURPLE+"TOCK BLOCKS:"+color.END+" Completed generating the utilization summary. Please view the report in the file "+ args.outfile +".")
 
 def find_months(today, args):
+    print(args)
     months = [0,0]
     if args.beginmonth is None:
         months[0] = today.month - 2
