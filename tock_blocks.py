@@ -45,7 +45,7 @@ def remove_leave(entries):
 def get_user_entries(username, entries):
     user_entries = []
     for entry in entries:
-        if entry[2] == username:
+        if entry['user'] == username:
             user_entries.append(entry)
     return user_entries
 
@@ -55,7 +55,7 @@ def get_entries_in_month(month_to_check, entries):
     time_periods_entries = []
     month_as_date = date_parse(month_to_check)
     for entry in entries:
-        entry_start = date_parse(entry[3])
+        entry_start = date_parse(entry['start_date'])
         if month_as_date.month == entry_start.month and month_as_date.year == entry_start.year:
             time_periods_entries.append(entry)
     return time_periods_entries
