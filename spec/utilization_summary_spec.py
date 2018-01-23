@@ -2,7 +2,11 @@ import unittest
 
 import sys
 sys.path.append('..')
+import datetime
 import utilization_summary
+from collections import namedtuple
+
+today = datetime.date.today()
 
 class UtilizationSummaryTestCase(unittest.TestCase):
     """Tests for `utilization_summary.py`."""
@@ -26,7 +30,7 @@ class UtilizationSummaryTestCase(unittest.TestCase):
 
     def test_monthly_and_average(self):
         test_user_list_row = ['name', 'type', 'team', [0.5, 4.0, 4.5], [1.5, 2.0, 4.5], [0.5, 3.0, 4.5], [0.5, 3.0, 4.5]]
-        result = [4.0, 2.0, 3.0, 3.0, 3.0]
+        result = [4.0, 2.0, 3.0, 3.0, 2.7]
         self.assertEqual(utilization_summary.monthly_and_average(test_user_list_row, 1), result)
 
     def test_mean(self):
@@ -35,16 +39,21 @@ class UtilizationSummaryTestCase(unittest.TestCase):
 
     def test_find_months_raise_error(self):
         """Does August and Oktoberfest render an error?"""
-        self.assertRaises(ValueError, lambda: utilization_summary.find_months("August", "Oktoberfest"))
+        Args = namedtuple('MyStruct', 'beginmonth lastmonth')
+        args = Args(beginmonth='August', lastmonth='Oktoberfest')
+        self.assertRaises(ValueError, lambda: utilization_summary.find_months(today, args))
 
     def test_find_months_december(self):
         """Does January and December render a list of [1,13]?"""
-        self.assertEqual(utilization_summary.find_months("January", "December"), [1,13])
+        Args = namedtuple('MyStruct', 'beginmonth lastmonth')
+        args = Args(beginmonth='January', lastmonth='December')
+        self.assertEqual(utilization_summary.find_months(today, args), [1,12])
 
     def test_find_months(self):
-        """Does August and October render a list of [9,11]?"""
-        self.assertEqual(utilization_summary.find_months("August", "October"), [8,11])
-
+        """Does August and October render a list of [8,10]?"""
+        Args = namedtuple('MyStruct', 'beginmonth lastmonth')
+        args = Args(beginmonth='August', lastmonth='October')
+        self.assertEqual(utilization_summary.find_months(today, args), [8,10])
 
 if __name__ == '__main__':
     unittest.main()
