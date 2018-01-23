@@ -83,10 +83,7 @@ def calculateMonthYear(monthValue, today):
         year_to_use = year_to_use - 1
         x = monthValue + 12
     mStart = ""
-    lastDay = "01"
-    if x < 9:
-        mStart = "0"+str(x)
-    elif(x == 9):
+    if x < 10:
         mStart = "0"+str(x)
     elif(monthValue == 12):
         mStart = "12"
@@ -103,8 +100,6 @@ def calc_hour_generator(calc_method):
             if(calc_method):
                 hour_count += float(entry['hours_spent'])
     return nestedEntryIterator
-
-# calc_billable_hours = calc_billable_hours()
 
 def calc_billable_hours(entries):
     billable_hours_count = 0.0

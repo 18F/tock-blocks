@@ -16,16 +16,16 @@ class UtilizationSummaryTestCase(unittest.TestCase):
     #
 
     def test_calc_billable_hours(self):
-        test_entry_list = [["TTS Acq / Internal Acq",0,0,0,0,1, "False"],["18F / Learn",0,0,0,0,1, "False"],["TTS Acq / Internal Acq",0,0,0,0,1, "True"],["TTS Acq / Learn",0,0,0,0,4, "True"]]
+        test_entry_list = [{'project_name': 'TTS Acq / Internal Acq', 'hours_spent': 1, 'billable': False},{'project_name': '18F / Learn', 'hours_spent': 1, 'billable': False},{'project_name': 'TTS Acq / Internal Acq', 'hours_spent': 1, 'billable': True}, {'project_name': 'TTS Acq / Learn', 'hours_spent': 4, 'billable': True}]
         self.assertEqual(utilization_summary.calc_billable_hours(test_entry_list), 5)
 
     def test_calc_internal_hours(self):
-        test_entry_list = [["TTS Acq / Internal Acq",0,0,0,0,1, "False"],["18F / Learn",0,0,0,0,1, "False"],["TTS Acq / Internal Acq",0,0,0,0,1, "True"],["TTS Acq / Learn",0,0,0,0,4, "True"]]
+        test_entry_list = [{'project_name': 'TTS Acq / Internal Acq', 'hours_spent': 1, 'billable': False}, {'project_name': 'TTS Acq / Internal Acq', 'hours_spent': 1, 'billable': True}, {'project_name': 'TTS Acq / Learn', 'hours_spent': 4, 'billable': True}]
         self.assertEqual(utilization_summary.calc_internal_hours(test_entry_list), 1)
 
     def test_calc_total_hours(self):
         """Does the sample list of entries return a total number of hours equal to the sum?"""
-        test_entry_list = [[0,0,0,0,0,1],[0,0,0,0,0,1],[0,0,0,0,0,1],[0,0,0,0,0,4]]
+        test_entry_list = [{'hours_spent': 1}, {'hours_spent': 1}, {'hours_spent': 1}, {'hours_spent': 4}]
         self.assertEqual(utilization_summary.calc_total_hours(test_entry_list), 7)
 
     def test_monthly_and_average(self):
