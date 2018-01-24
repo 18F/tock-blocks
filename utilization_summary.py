@@ -37,7 +37,7 @@ def all_users_from_file(userfile, args):
     user_list = [0] * len(users)
     for x in range(len(users)):
         user_list[x] = users[x] + utilization_calculator(users[x][0], months, time_entries, today)
-    write_output(args, user_list, months)
+    write_output(args, user_list, months, today)
     print(color.PURPLE+"TOCK BLOCKS:"+color.END+" Completed generating the utilization summary. Please view the report in the file "+ args.outfile +".")
 
 def find_months(today, args):
@@ -141,18 +141,21 @@ def get_data_from_tock():
     print(color.PURPLE+"TOCK BLOCKS:"+color.END+' Completed downloading tock data. Now processing the data.')
     return parsed_reponse
 
-def write_output(args, user_list, months):
-    with open(args.outfile, 'w') as outcsv:
+def write_output(args, user_list, months, today):
+    file_to_print = 'outfile-{}.csv'.format(today.strftime("%Y-%m-%d))
+    if args.outfile is not None:
+        file_to_print = args.outfile
+    with open(file_to_print 'w') as outcsv:
         writer = csv.writer(outcsv, delimiter=',', quotechar='|', quoting=csv.QUOTE_MINIMAL, lineterminator='\n')
         if months[0] <= 0: # check if starting in previous year
             firstMonth = months[0] + 11
             months_to_print = month_name_list[firstMonth:] + month_name_list[:months[1]-1]
         else:
             months_to_print = month_name_list[months[0]-1+months[1]-1]
-        header_row = ['Name', 'Position', 'Team', 'Project type']+months_to_print+['Average for last quarter']
+        header_row = ['Name', 'Position', 'Team', 'Project type']+months_to_print+['Average for last quarter', 'Hours/Week to get to 60%', 'Hours/Week to get to 80%']
         writer.writerow(header_row)
         for item in user_list:
-            toprow = [item[0], item[1], item[2], 'Billable']+monthly_and_average(item, 0)
+            toprow = item[0:2] + ['Billable']+monthly_and_average(item, 0)
             middlelist= ['', '', '', 'Internal projects'] + monthly_and_average(item, 1)
             bottom= ['', '', '', 'Utilization percentage'] + monthly_and_average(item, 2)
             writer.writerow(toprow)
