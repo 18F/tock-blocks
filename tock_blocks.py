@@ -37,7 +37,7 @@ leave_types = ['Out of Office - Sick Leave',
 def remove_leave(entries):
     filtered_entries = []
     for entry in entries:
-        if (entry[0] not in leave_types):
+        if (entry['project_name'] not in leave_types):
             filtered_entries.append(entry)
     return filtered_entries
 
@@ -45,7 +45,7 @@ def remove_leave(entries):
 def get_user_entries(username, entries):
     user_entries = []
     for entry in entries:
-        if entry[2] == username:
+        if entry['user'] == username:
             user_entries.append(entry)
     return user_entries
 
@@ -55,7 +55,7 @@ def get_entries_in_month(month_to_check, entries):
     time_periods_entries = []
     month_as_date = date_parse(month_to_check)
     for entry in entries:
-        entry_start = date_parse(entry[3])
+        entry_start = date_parse(entry['start_date'])
         if month_as_date.month == entry_start.month and month_as_date.year == entry_start.year:
             time_periods_entries.append(entry)
     return time_periods_entries
@@ -64,10 +64,10 @@ def get_entries_in_month(month_to_check, entries):
 def create_project_dict(entries):
     project_dict = {}
     for entry in entries:
-        if entry[0] in project_dict:
-            project_dict[entry[0]] = project_dict[entry[0]] + float(entry[5])
+        if entry['project_name'] in project_dict:
+            project_dict[entry['project_name']] = project_dict[entry['project_name']] + float(entry['hours_spent'])
         else:
-            project_dict[entry[0]] = float(entry[5])
+            project_dict[entry['project_name']] = float(entry['hours_spent'])
     return project_dict
 
 # Calculate project percentages
@@ -118,6 +118,8 @@ class color:
 
 # Function for an array of person
 def block_by_array(users, entries, start, end, nice_display, exclude_leave):
+    if args.file is not None:
+        time_entries = tock_blocks.read_CSV_to_list(args.file)
     for u in users:
         print_handler(u, nice_display, 'header')
         if (nice_display):

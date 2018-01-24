@@ -13,21 +13,21 @@ class TockBlocksTestCase(unittest.TestCase):
     # def test_block_for_one_person(self):
 
     def test_remove_leave_removing(self):
-        test_entries = [["Out of Office - Other", 0, 0, 0, 0, 0], ["Out of Office - Other", 0, 0, 0, 0, 0], ["Easting", 0, 0, 0, 0, 0]]
-        result = [["Easting", 0, 0, 0, 0, 0]]
+        test_entries = [{'project_name': 'Out of Office - Other'}, {'project_name': 'Out of Office - Other'}, {'project_name': 'Easting'}]
+        result = [{'project_name': 'Easting'}]
         self.assertEqual(tock_blocks.remove_leave(test_entries), result)
 
     def test_remove_leave_not_removing(self):
-        test_entries = [["moe", 0, 0, 0, 0, 0], ["ruer", 0, 0, 0, 0, 0], ["Easting", 0, 0, 0, 0, 0]]
+        test_entries = [{'project_name': 'moe'}, {'project_name': 'ruer'}, {'project_name': 'Easting'}]
         self.assertEqual(tock_blocks.remove_leave(test_entries), test_entries)
 
     def test_get_user_entries_removing(self):
-        test_entries = [["Out of Office - Other", 0, "hi.me", 0, 0, 0], ["Out of Office - Other", 0, "jes.mick", 0, 0, 0], ["Easting", 0, "hi.me", 0, 0, 0]]
-        result = [["Out of Office - Other", 0, "hi.me", 0, 0, 0], ["Easting", 0, "hi.me", 0, 0, 0]]
+        test_entries = [{'project_name': 'Out of Office - Other', 'user': 'hi.me'}, {'project_name': 'Easting', 'user': 'hi.me'}]
+        result = [{'project_name': 'Out of Office - Other', 'user': 'hi.me'}, {'project_name': 'Easting', 'user': 'hi.me'}]
         self.assertEqual(tock_blocks.get_user_entries("hi.me", test_entries), result)
 
     def test_get_user_entries_not_removing(self):
-        test_entries = [["Out of Office - Other", 0, "hi.me", 0, 0, 0], ["Out of Office - Other", 0, "hi.me", 0, 0, 0], ["Easting", 0, "hi.me", 0, 0, 0]]
+        test_entries = [{'project_name': 'Out of Office - Other', 'user': 'hi.me'}, {'project_name': 'Out of Office - Other', 'user': 'hi.me'}, {'project_name': 'Easting', 'user': 'hi.me'}]
         self.assertEqual(tock_blocks.get_user_entries("hi.me", test_entries), test_entries)
 
     def get_entries_in_time_period_util(self):
@@ -41,8 +41,8 @@ class TockBlocksTestCase(unittest.TestCase):
         self.assertCountEqual(tock_blocks.get_entries_in_time_period("2016-11-01", "2016-11-30", test_entries, 'tb'), result)
 
     def test_create_project_dic(self):
-        test_entries = [["meow", 0, 0, 0, 0, 5], ["meow", 0, 0, 0, 0, 5], ["tom", 0, 0, 0, 0, 3], ["travel", 0, 0, 0, 0, 5], ["box", 0, 0, 0, 0, 2], ["meow", 0, 0, 0, 0, 4]]
-        result = {'meow': 14, "tom": 3, "travel": 5, "box":2}
+        test_entries = [{'project_name': 'meow', 'hours_spent':5}, {'project_name': 'meow', 'hours_spent':5}, {'project_name': 'tom', 'hours_spent':3}, {'project_name': 'travel', 'hours_spent':5}, {'project_name':'box', 'hours_spent':2}]
+        result = {'meow': 10, "tom": 3, "travel": 5, "box":2}
         self.assertCountEqual(tock_blocks.create_project_dict(test_entries), result)
 
     def test_calc_project_perc(self):

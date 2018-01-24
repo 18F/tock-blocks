@@ -2,6 +2,11 @@ import tock_blocks
 import csv
 from dateutil.parser import parse as date_parse
 import datetime
+import os
+import urllib.request
+import json
+
+TOCK_API_KEY = os.environ['TOCK_API_KEY']
 
 month_name_list = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"]
 
@@ -18,9 +23,15 @@ class color:
    END = '\033[0m'
 
 def all_users_from_file(userfile, args):
-    print(color.PURPLE+"TOCK BLOCKS:"+color.END+" Generating the utilization report from the data in "+args.file+".")
+    data_source = 'api'
+    if args.file is not None:
+        data_source = args.file
+    print("{}TOCK BLOCKS:{} Generating the utilization report from the data in {}.".format(color.PURPLE, color.END, data_source))
     users = tock_blocks.read_CSV_to_list(userfile)
-    time_entries = tock_blocks.read_CSV_to_list(args.file)
+    if args.file is not None:
+        time_entries = tock_blocks.read_CSV_to_list(args.file)
+    else:
+        time_entries = get_data_from_tock()
     today = datetime.date.today()
     months = find_months(today, args)
     user_list = [0] * len(users)
@@ -30,7 +41,6 @@ def all_users_from_file(userfile, args):
     print(color.PURPLE+"TOCK BLOCKS:"+color.END+" Completed generating the utilization summary. Please view the report in the file "+ args.outfile +".")
 
 def find_months(today, args):
-    print(args)
     months = [0,0]
     if args.beginmonth is None:
         months[0] = today.month - 2
@@ -73,10 +83,7 @@ def calculateMonthYear(monthValue, today):
         year_to_use = year_to_use - 1
         x = monthValue + 12
     mStart = ""
-    lastDay = "01"
-    if x < 9:
-        mStart = "0"+str(x)
-    elif(x == 9):
+    if x < 10:
         mStart = "0"+str(x)
     elif(monthValue == 12):
         mStart = "12"
@@ -91,29 +98,27 @@ def calc_hour_generator(calc_method):
         hour_count = 0
         for entry in entries:
             if(calc_method):
-                hour_count += float(entry[5])
+                hour_count += float(entry['hours_spent'])
     return nestedEntryIterator
-
-# calc_billable_hours = calc_billable_hours()
 
 def calc_billable_hours(entries):
     billable_hours_count = 0.0
     for entry in entries:
-        if(entry[6] == "True"):
-            billable_hours_count = billable_hours_count + float(entry[5])
+        if(entry['billable'] == True):
+            billable_hours_count = billable_hours_count + float(entry['hours_spent'])
     return billable_hours_count
 
 def calc_internal_hours(entries):
     internal_hours = 0.0
     for entry in entries:
-        if(entry[0][:22] == "TTS Acq / Internal Acq" and entry[6]== "False"):
-            internal_hours = internal_hours + float(entry[5])
+        if(entry['project_name'][:22] == "TTS Acq / Internal Acq" and entry['billable']== False):
+            internal_hours = internal_hours + float(entry['hours_spent'])
     return internal_hours
 
 def calc_total_hours(entries):
     total_hours = 0.0
     for entry in entries:
-        total_hours = total_hours + float(entry[5])
+        total_hours = total_hours + float(entry['hours_spent'])
     return total_hours
 
 def monthly_and_average(user_list_row, sub_array_ind):
@@ -123,6 +128,18 @@ def monthly_and_average(user_list_row, sub_array_ind):
 
 def mean(numbers):
     return float(sum(numbers)) / max(len(numbers), 1)
+
+def get_data_from_tock():
+    print(color.PURPLE+"TOCK BLOCKS:"+color.END+' Downloading data from tock! This is a big file. It could take several minutes.')
+    url = 'https://tock.18f.gov/api/timecards.json?after=2017-10-01'
+    headers = {}
+    headers['Authorization'] = 'token %s' % TOCK_API_KEY
+
+    req = urllib.request.Request(url, headers = headers)
+    html = urllib.request.urlopen(req).read()
+    parsed_reponse = json.loads(html.decode("utf-8"))
+    print(color.PURPLE+"TOCK BLOCKS:"+color.END+' Completed downloading tock data. Now processing the data.')
+    return parsed_reponse
 
 def write_output(args, user_list, months):
     with open(args.outfile, 'w') as outcsv:
@@ -135,9 +152,6 @@ def write_output(args, user_list, months):
         header_row = ['Name', 'Position', 'Team', 'Project type']+months_to_print+['Average for last quarter']
         writer.writerow(header_row)
         for item in user_list:
-            if(item[0] == 'victoria.mcfadden' or item[0] == 'ashley.owens' or item[0] == 'hassan.harris'):
-                print(item[0])
-                print(item)
             toprow = [item[0], item[1], item[2], 'Billable']+monthly_and_average(item, 0)
             middlelist= ['', '', '', 'Internal projects'] + monthly_and_average(item, 1)
             bottom= ['', '', '', 'Utilization percentage'] + monthly_and_average(item, 2)
