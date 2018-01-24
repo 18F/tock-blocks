@@ -40,8 +40,6 @@ It will then print out an array of your major blocks of projects (rounded to the
 
 `-e` end date: The date that you would like to look at tock entries ending before this date.
 
-`-v` verbose: Prints additional debugging information to the command line.
-
 `-d` display format: Display in a readable format or into markdown
 
 `-n` no leave: remove holidays, annual and award leave from the report

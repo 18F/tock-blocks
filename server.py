@@ -21,9 +21,6 @@ def main():
     parser.add_argument('-e', action='store', default='2016-06-01',
                         dest='end_date',
                         help='YYYY-MM-DD The end date of the tock entries you would like to search through.')
-    parser.add_argument('-v', action='store_true', default=False,
-                        dest='verbose',
-                        help='print out csv headers')
     parser.add_argument('-d', '--display_format',
                         dest='display_format',
                         help='print display in pretty colors on standard out, or in markdown')
@@ -32,7 +29,6 @@ def main():
                         dest='exclude_leave',
                         help='exclude annual leave and holidays from the report')
     parser.add_argument('-o','--outfile',
-                        default='outfile.csv',
                         dest='outfile',
                         help='outfile for util summary')
     parser.add_argument('-b','--beginmonth',
@@ -44,11 +40,6 @@ def main():
 
 
     args = parser.parse_args()
-    if(args.verbose):
-        print("Printing Length and CSV Headers")
-        print(len(time_entries))
-        print(time_entries[0])
-        print(time_entries[1])
     if (args.program == 'tock-blocks'):
         if(args.display_format == 'pretty'):
             print("Tock data from "+args.start_date + " to "+args.end_date)
