@@ -41,7 +41,7 @@ def all_users_from_file(userfile, args):
         user_list[user_index] = users[user_index] + \
             utilization_calculator(
                 users[user_index][0], months, time_entries, today)
-    write_output(args, user_list, months)
+    write_output(args, user_list, months, today)
     print(color.PURPLE+"TOCK BLOCKS:"+color.END+" Completed generating the utilization summary. Please view the report in the file "+ args.outfile +".")
 
 def find_months(today, args):
@@ -147,8 +147,9 @@ def get_data_from_tock():
     print(color.PURPLE+"TOCK BLOCKS:"+color.END+' Completed downloading tock data. Now processing the data.')
     return parsed_reponse
 
-def write_output(args, user_list, months):
-    with open(args.outfile, 'w') as outcsv:
+def write_output(args, user_list, months, today):
+    file_to_write = develop_filename(args, today)
+    with open(file_to_write, 'w') as outcsv:
         writer = csv.writer(outcsv, delimiter=',', quotechar='|', quoting=csv.QUOTE_MINIMAL, lineterminator='\n')
         if months[0] <= 0: # check if starting in previous year
             first_month = months[0] + 11
@@ -165,3 +166,8 @@ def write_output(args, user_list, months):
             writer.writerow(middlelist)
             writer.writerow(bottom)
             writer.writerow(['']*(len(item)+1))
+
+def develop_filename(args, today):
+    if args.outfile is not None:
+        return args.outfile
+    return 'outfile-{}.csv'.format(today.strftime("%Y-%m-%d"))
