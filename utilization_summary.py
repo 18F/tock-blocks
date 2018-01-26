@@ -38,11 +38,11 @@ def all_users_from_file(userfile, args):
         data_source = args.file
     print("{}TOCK BLOCKS:{} Generating the utilization report from the data in {}.".format(color.PURPLE, color.END, data_source))
     users = tock_blocks.read_csv_to_list(userfile)
-    if args.file is not None:
-        time_entries = tock_blocks.read_csv_to_list(args.file)
-    else:
-        time_entries = get_data_from_tock()
     today = datetime.date.today()
+    if data_source == 'api':
+        time_entries = get_data_from_tock(today)
+    else:
+        time_entries = tock_blocks.read_csv_to_list(args.file)
     months = find_months(today, args)
     user_list = [0] * len(users)
     for user_index in range(len(users)):
@@ -51,6 +51,26 @@ def all_users_from_file(userfile, args):
                 users[user_index][0], months, time_entries, today)
     write_output(args, user_list, months, today)
     print(color.PURPLE+"TOCK BLOCKS:"+color.END+" Completed generating the utilization summary. Please view the report in the file "+ args.outfile +".")
+
+
+def get_data_from_tock(today):
+    """
+    Pulls api data from tock
+    """
+    last_year = today.year - 1
+    query_month = today.month + 1
+    print(color.PURPLE+"TOCK BLOCKS:"+color.END +
+          ' Downloading data from tock! This is a big file. It could take several minutes.')
+    url = 'https://tock.18f.gov/api/timecards.json?after={}-{}-01'.format(str(last_year), query_month)
+    headers = {}
+    headers['Authorization'] = 'token %s' % TOCK_API_KEY
+
+    req = urllib.request.Request(url, headers=headers)
+    html = urllib.request.urlopen(req).read()
+    parsed_reponse = json.loads(html.decode("utf-8"))
+    print(color.PURPLE+"TOCK BLOCKS:"+color.END +
+          ' Completed downloading tock data. Now processing the data.')
+    return parsed_reponse
 
 def find_months(today, args):
     """
@@ -183,21 +203,6 @@ def mean(numbers):
     Calculates the mean of an arrary
     """
     return float(sum(numbers)) / max(len(numbers), 1)
-
-def get_data_from_tock():
-    """
-    Pulls api data from tock
-    """
-    print(color.PURPLE+"TOCK BLOCKS:"+color.END+' Downloading data from tock! This is a big file. It could take several minutes.')
-    url = 'https://tock.18f.gov/api/timecards.json?after=2017-10-01'
-    headers = {}
-    headers['Authorization'] = 'token %s' % TOCK_API_KEY
-
-    req = urllib.request.Request(url, headers = headers)
-    html = urllib.request.urlopen(req).read()
-    parsed_reponse = json.loads(html.decode("utf-8"))
-    print(color.PURPLE+"TOCK BLOCKS:"+color.END+' Completed downloading tock data. Now processing the data.')
-    return parsed_reponse
 
 def write_output(args, user_list, months, today):
     """

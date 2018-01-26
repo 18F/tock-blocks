@@ -23,7 +23,7 @@ It will then print out an array of your major blocks of projects (rounded to the
 5. Options will default to producing a utilization report for the past three months.
 6. Additional options:
     * `-p tock-blocks`: run the `tock-blocks` command line summary of the application
-    * `-b','--beginmonth`: choose a start date other than the default (3 months ago) beginning month can be up to a year ago. Months must be the full name with capitalization i.e "September" or "July".
+    * `-b','--beginmonth`: choose a start date other than the default (a full year ago) beginning month can be up to a year ago. Months must be the full name with capitalization i.e "September" or "July".
     * `'-l','--lastmonth'`: choose a start date other than the default (current month)
     * `'-f', '--file'`: a json file to process the information.
 5. Upload file to google drive, outfile.csv.
