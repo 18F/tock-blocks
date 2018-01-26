@@ -1,3 +1,8 @@
+"""
+Module to build a team utlization report in csv
+from the Tock API data
+and csv list of users
+"""
 import csv
 import os
 import datetime
@@ -25,6 +30,9 @@ class color:
     END = '\033[0m'
 
 def all_users_from_file(userfile, args):
+    """
+    Generate the entire utilization report from a csv of users
+    """
     data_source = 'api'
     if args.file is not None:
         data_source = args.file
@@ -45,6 +53,9 @@ def all_users_from_file(userfile, args):
     print(color.PURPLE+"TOCK BLOCKS:"+color.END+" Completed generating the utilization summary. Please view the report in the file "+ args.outfile +".")
 
 def find_months(today, args):
+    """
+    Convert supplied users into a range of months to iterate over
+    """
     months = [0, 0]
     if args.beginmonth is None:
         months[0] = today.month - 2
@@ -59,6 +70,9 @@ def find_months(today, args):
     return months
 
 def utilization_calculator(user, months, time_entries, today):
+    """
+    Figure out the utilization and billable levels for a user
+    """
     # Grab user
     user_entries = tock_blocks.get_user_entries(user, time_entries)
     # Calculate each month billable/ utilization / total for that user
@@ -83,6 +97,9 @@ def utilization_calculator(user, months, time_entries, today):
     return user_values
 
 def calculate_month_year(month_value, today):
+    """
+    Convert a month index to a string to be supplied in a filter
+    """
     year_to_use = today.year
     x = month_value
     if month_value <= 0:
@@ -98,16 +115,24 @@ def calculate_month_year(month_value, today):
     start_month = str(year_to_use) + '-' + start_month
     return start_month
 
-#TODO convert to lamdas
 def calc_hour_generator(calculator_method):
-    def nestedEntryIterator(entries):
+    """
+    TODO this will allow for lambdas to go through the different calculators
+    """
+    def nested_entry_iterator(entries):
+        """
+        Internal function for the lambda
+        """
         hour_count = 0
         for entry in entries:
             if calculator_method:
                 hour_count += float(entry['hours_spent'])
-    return nestedEntryIterator
+    return nested_entry_iterator
 
 def calc_billable_hours(entries):
+    """
+    Calculates billable hours from an array of entry dictionaries
+    """
     billable_hours_count = 0.0
     for entry in entries:
         if entry['billable']:
@@ -115,6 +140,9 @@ def calc_billable_hours(entries):
     return billable_hours_count
 
 def calc_internal_hours(entries):
+    """
+    Calculates internal utilizable hours from an array of entry dictionaries
+    """
     internal_hours = 0.0
     for entry in entries:
         if entry['project_name'][:22] == "TTS Acq / Internal Acq" and entry['billable'] == False:
@@ -122,20 +150,44 @@ def calc_internal_hours(entries):
     return internal_hours
 
 def calc_total_hours(entries):
+    """
+    Calculates sum of hours from an array of entry dictionaries
+    """
     total_hours = 0.0
     for entry in entries:
         total_hours = total_hours + float(entry['hours_spent'])
     return total_hours
 
-def monthly_and_average(user_list_row, sub_array_ind):
+def month_average_and_goal_row(user_list_row, sub_array_ind):
+    """
+    Append the user's monthly data to averages and utilization targets
+    """
     filtered_list = [i[sub_array_ind] for i in user_list_row[3:]]
-    filtered_list.append(round(mean(filtered_list[-3:]), 1))
+    quarterly_average = round(mean(filtered_list[-3:]), 1)
+    filtered_list = filtered_list + [quarterly_average, '',
+                                     weekly_difference_to_goal(quarterly_average, 60),
+                                     weekly_difference_to_goal(quarterly_average, 80)
+                                     ]
     return filtered_list
 
+def weekly_difference_to_goal(average_value, level):
+    """
+    Calculate how many more hours a week the person would need to be usable for to
+    achieve a utiliztaion target
+    """
+    weekly_difference = (level-average_value)* 0.4
+    return str(weekly_difference)
+
 def mean(numbers):
+    """
+    Calculates the mean of an arrary
+    """
     return float(sum(numbers)) / max(len(numbers), 1)
 
 def get_data_from_tock():
+    """
+    Pulls api data from tock
+    """
     print(color.PURPLE+"TOCK BLOCKS:"+color.END+' Downloading data from tock! This is a big file. It could take several minutes.')
     url = 'https://tock.18f.gov/api/timecards.json?after=2017-10-01'
     headers = {}
@@ -148,9 +200,16 @@ def get_data_from_tock():
     return parsed_reponse
 
 def write_output(args, user_list, months, today):
+    """
+    Builds a csv of the utilization file
+    """
     file_to_write = develop_filename(args, today)
     with open(file_to_write, 'w') as outcsv:
-        writer = csv.writer(outcsv, delimiter=',', quotechar='|', quoting=csv.QUOTE_MINIMAL, lineterminator='\n')
+        writer = csv.writer(outcsv, delimiter=',',
+                            quotechar='|',
+                            quoting=csv.QUOTE_MINIMAL,
+                            lineterminator='\n'
+                           )
         if months[0] <= 0: # check if starting in previous year
             first_month = months[0] + 11
             months_to_print = MONTH_NAME_LIST[first_month:] + MONTH_NAME_LIST[:months[1]-1]
@@ -159,15 +218,18 @@ def write_output(args, user_list, months, today):
         header_row = ['Name', 'Position', 'Team', 'Project type']+months_to_print+['Average for last quarter']
         writer.writerow(header_row)
         for item in user_list:
-            toprow = [item[0], item[1], item[2], 'Billable']+monthly_and_average(item, 0)
-            middlelist = ['', '', '', 'Internal projects'] + monthly_and_average(item, 1)
-            bottom = ['', '', '', 'Utilization percentage'] + monthly_and_average(item, 2)
+            toprow = [item[0], item[1], item[2], 'Billable'] + month_average_and_goal_row(item, 0)
+            middlelist = ['', '', '', 'Internal projects'] + month_average_and_goal_row(item, 1)
+            bottom = ['', '', '', 'Utilization percentage'] + month_average_and_goal_row(item, 2)
             writer.writerow(toprow)
             writer.writerow(middlelist)
             writer.writerow(bottom)
             writer.writerow(['']*(len(item)+1))
 
 def develop_filename(args, today):
+    """
+    Figues out whether to use a supplied filename or a date stamped entry
+    """
     if args.outfile is not None:
         return args.outfile
-    return 'outfile-{}.csv'.format(today.strftime("%Y-%m-%d"))
+    return 'utlization-summary-{}.csv'.format(today.strftime("%Y-%m-%d"))
