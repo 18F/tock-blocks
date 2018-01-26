@@ -1,14 +1,17 @@
+"""This module serves as the main cli entry point for the applications."""
 import argparse
 import tock_blocks
 import utilization_summary
 
+
 def main():
+    """Initialize the functions."""
     parser = argparse.ArgumentParser(description='Calculate a users major time blocks')
-    parser.add_argument('-p','--program',
+    parser.add_argument('-p', '--program',
                         help='choose between tock blocks and the full user program.',
                         default='util-csv',
                         dest='program')
-    parser.add_argument('-u','--users', nargs='+',
+    parser.add_argument('-u', '--users', nargs='+',
                         help='user or users list',
                         default='darren.divens',
                         dest='users')
@@ -27,35 +30,29 @@ def main():
     parser.add_argument('-d', '--display_format',
                         dest='display_format',
                         help='print display in pretty colors on standard out, or in markdown')
-    parser.add_argument('-n','--no-leave', action='store_true',
+    parser.add_argument('-n', '--no-leave', action='store_true',
                         default=False,
                         dest='exclude_leave',
                         help='exclude annual leave and holidays from the report')
-    parser.add_argument('-o','--outfile',
-                        default='outfile.csv',
+    parser.add_argument('-o', '--outfile',
                         dest='outfile',
                         help='outfile for util summary')
-    parser.add_argument('-b','--beginmonth',
+    parser.add_argument('-b', '--beginmonth',
                         dest='beginmonth',
                         help='starting month for the utilization summary')
-    parser.add_argument('-l','--lastmonth',
+    parser.add_argument('-l', '--lastmonth',
                         dest='lastmonth',
                         help='last or ending month for the utilization summary')
 
 
     args = parser.parse_args()
-    if(args.verbose):
-        print("Printing Length and CSV Headers")
-        print(len(time_entries))
-        print(time_entries[0])
-        print(time_entries[1])
-    if (args.program == 'tock-blocks'):
-        if(args.display_format == 'pretty'):
+    if args.program == 'tock-blocks':
+        if args.display_format == 'pretty':
             print("Tock data from "+args.start_date + " to "+args.end_date)
-        if(args.display_format == 'markdown'):
+        if args.display_format == 'markdown':
             print("# Tock data from "+args.start_date + " to "+args.end_date)
-        tock_blocks.block_by_array(args.users, args.start_date, args.end_date, args.display_format, args.exclude_leave)
-    elif (args.program == 'util-csv'):
+        tock_blocks.block_by_array(args)
+    elif args.program == 'util-csv':
         utilization_summary.all_users_from_file("users.csv", args)
 
 if __name__ == "__main__":

@@ -16,7 +16,7 @@ cd tock-blocks
 It will then print out an array of your major blocks of projects (rounded to the nearest 5%), as well of a list of other projects that are greater than 2.5% of your time.
 
 ### Running the Regular Utilization Report
-1. Set TOCK_API_KEY environment variable with `export TOCK_API_KEY=<your_key>`
+1. Set TOCK_API_KEY environment variable with `export TOCK_API_KEY=<your_key>`. You can obtain an API Key by requesting one from the Tock dev team.
 2. `cd tock-blocks`
 3. Make sure it is running in Python 3. Verify by checking `pyenv local`
 4. Running the command ` python server.py`.
