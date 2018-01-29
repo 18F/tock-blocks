@@ -1,10 +1,9 @@
-import unittest
-
-import sys
-sys.path.append('..')
 import datetime
-import utilization_summary
+import unittest
+import sys
 from collections import namedtuple
+import utilization_summary
+sys.path.append('..')
 
 today = datetime.date.today()
 
@@ -16,7 +15,7 @@ class UtilizationSummaryTestCase(unittest.TestCase):
     #
 
     def test_calc_billable_hours(self):
-        test_entry_list = [{'project_name': 'TTS Acq / Internal Acq', 'hours_spent': 1, 'billable': False},{'project_name': '18F / Learn', 'hours_spent': 1, 'billable': False},{'project_name': 'TTS Acq / Internal Acq', 'hours_spent': 1, 'billable': True}, {'project_name': 'TTS Acq / Learn', 'hours_spent': 4, 'billable': True}]
+        test_entry_list = [{'project_name': 'TTS Acq / Internal Acq', 'hours_spent': 1, 'billable': False}, {'project_name': '18F / Learn', 'hours_spent': 1, 'billable': False}, {'project_name': 'TTS Acq / Internal Acq', 'hours_spent': 1, 'billable': True}, {'project_name': 'TTS Acq / Learn', 'hours_spent': 4, 'billable': True}]
         self.assertEqual(utilization_summary.calc_billable_hours(test_entry_list), 5)
 
     def test_calc_internal_hours(self):
@@ -36,7 +35,7 @@ class UtilizationSummaryTestCase(unittest.TestCase):
 
     def test_mean(self):
         """Does a list of 4 2s have a mean of 2?"""
-        self.assertEqual(utilization_summary.mean([2,2,2,2]), 2)
+        self.assertEqual(utilization_summary.mean([2, 2, 2, 2]), 2)
 
     def test_find_months_raise_error(self):
         """Does August and Oktoberfest render an error?"""
@@ -48,13 +47,13 @@ class UtilizationSummaryTestCase(unittest.TestCase):
         """Does January and December render a list of [1,13]?"""
         Args = namedtuple('MyStruct', 'beginmonth lastmonth')
         args = Args(beginmonth='January', lastmonth='December')
-        self.assertEqual(utilization_summary.find_months(today, args), [1,12])
+        self.assertEqual(utilization_summary.find_months(today, args), [1, 12])
 
     def test_find_months(self):
         """Does August and October render a list of [8,10]?"""
         Args = namedtuple('MyStruct', 'beginmonth lastmonth')
         args = Args(beginmonth='August', lastmonth='October')
-        self.assertEqual(utilization_summary.find_months(today, args), [8,10])
+        self.assertEqual(utilization_summary.find_months(today, args), [8, 10])
 
 if __name__ == '__main__':
     unittest.main()
