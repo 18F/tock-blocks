@@ -50,9 +50,9 @@ class TockBlocksTestCase(unittest.TestCase):
         result = {'meow': 10, 'travel': 20, 'eating': 25, 'toxic': 40}
         self.assertEqual(tock_blocks.calculate_projects_percentage(test_project_dict, 24.75), result)
 
-    def test_myRound(self):
-        self.assertEqual(tock_blocks.myRound(32), 30)
-        self.assertEqual(tock_blocks.myRound(33), 35)
+    def test_my_round(self):
+        self.assertEqual(tock_blocks.my_round(32), 30)
+        self.assertEqual(tock_blocks.my_round(33), 35)
 
     def test_reduce_dict_to_hours(self):
         test_project_dict = {'meow': 3, 'travel': 5, 'eating': 6.25, 'toxic': 10.5}
