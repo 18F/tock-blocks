@@ -28,10 +28,11 @@ class UtilizationSummaryTestCase(unittest.TestCase):
         test_entry_list = [{'hours_spent': 1}, {'hours_spent': 1}, {'hours_spent': 1}, {'hours_spent': 4}]
         self.assertEqual(utilization_summary.calc_total_hours(test_entry_list), 7)
 
-    def test_monthly_and_average(self):
+    def test_month_average_and_goal_row(self):
         test_user_list_row = ['name', 'type', 'team', [0.5, 4.0, 4.5], [1.5, 2.0, 4.5], [0.5, 3.0, 4.5], [0.5, 3.0, 4.5]]
-        result = [4.0, 2.0, 3.0, 3.0, 2.7]
-        self.assertEqual(utilization_summary.monthly_and_average(test_user_list_row, 1), result)
+        result = [4.0, 2.0, 3.0, 3.0, 2.7, '', '58.9', '78.9']
+        self.assertEqual(utilization_summary.month_average_and_goal_row(
+            test_user_list_row, 1), result)
 
     def test_mean(self):
         """Does a list of 4 2s have a mean of 2?"""

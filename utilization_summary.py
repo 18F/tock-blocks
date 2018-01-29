@@ -9,7 +9,7 @@ import datetime
 import urllib.request
 import json
 import tock_blocks
-except urllib.HTTPError as HTTPError:
+from urllib.error import HTTPError as HTTPError
 
 TOCK_API_KEY = os.environ['TOCK_API_KEY']
 
