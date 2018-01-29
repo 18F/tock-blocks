@@ -114,15 +114,23 @@ def utilization_calculator(user, months, time_entries, today):
         billable_hours = calc_billable_hours(month_time_entries)
         internal_hours = calc_internal_hours(month_time_entries)
         total_hours = calc_total_hours(month_time_entries)
-        billable_percent = 0.0
-        internal_percent = 0.0
-        if total_hours > 0:
-            billable_percent = round(billable_hours/total_hours*100, 1)
-            internal_percent = round(internal_hours/total_hours*100, 1)
-        utilizable_percent = round((billable_percent + internal_percent), 1)
-        user_values[array_ind] = [billable_percent, internal_percent, utilizable_percent]
+        user_values[array_ind] = find_percentages(
+            billable_hours, internal_hours, total_hours)
         array_ind += 1
     return user_values
+
+def find_percentages(billable_hours, internal_hours, total_hours):
+    """
+    Take total billable, internal, hours to find out the percentages of each.
+    """
+    billable_percent = 0.0
+    internal_percent = 0.0
+    if total_hours > 0:
+        billable_percent = round(billable_hours/total_hours*100, 1)
+        internal_percent = round(internal_hours/total_hours*100, 1)
+        utilizable_percent = round((billable_percent + internal_percent), 1)
+        return [billable_percent, internal_percent, utilizable_percent]
+    return [0.0, 0.0, 0.0]
 
 def calculate_month_year(month_value, today):
     """
