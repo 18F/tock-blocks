@@ -7,9 +7,9 @@ import csv
 import os
 import datetime
 import urllib.request
+from urllib.error import HTTPError as HTTPError
 import json
 import tock_blocks
-from urllib.error import HTTPError as HTTPError
 
 TOCK_API_KEY = os.environ['TOCK_API_KEY']
 
@@ -36,7 +36,11 @@ def all_users_from_file(userfile, args):
     months = find_months(today, args)
     user_list = [0] * len(users)
     for user_index in range(len(users)):
-        print('{} Downloading data from tock & processing for {}.'.format(PRINT_PREFIX, users[user_index][0]))
+        print('{} Downloading data from tock & processing for {}.'.format(
+            PRINT_PREFIX,
+            users[user_index][0]
+            )
+             )
         if data_source == 'api':
             time_entries = get_data_from_tock(today, users[user_index][0])
         user_list[user_index] = users[user_index] + \
@@ -48,6 +52,14 @@ def all_users_from_file(userfile, args):
 def get_data_from_tock(today, tock_user_name):
     """
     Pulls api data from tock
+
+    Args:
+        today (datetime): datetime for current time
+        tock_user_name (str): username of current tock query
+
+    Returns:
+        An array of tock_entries as a dict for that user from the past year
+        and empty array if there is a failure
     """
     last_year = today.year - 1
     query_month = today.month + 1
@@ -66,7 +78,7 @@ def get_data_from_tock(today, tock_user_name):
         return parsed_reponse
     except HTTPError:
         print('Failed to download data for {}'.format(tock_user_name))
-        return
+        return []
 
 def find_months(today, args):
     """
@@ -180,10 +192,11 @@ def month_average_and_goal_row(user_list_row, sub_array_ind):
     """
     filtered_list = [i[sub_array_ind] for i in user_list_row[3:]]
     quarterly_average = round(mean(filtered_list[-3:]), 1)
-    filtered_list = filtered_list + [quarterly_average, '',
-                                     weekly_difference_to_goal(quarterly_average, 60),
-                                     weekly_difference_to_goal(quarterly_average, 80)
-                                    ]
+    filtered_list = filtered_list + [
+        quarterly_average,
+        weekly_difference_to_goal(quarterly_average, 60),
+        weekly_difference_to_goal(quarterly_average, 80)
+        ]
     return filtered_list
 
 def weekly_difference_to_goal(average_value, level):
@@ -191,7 +204,7 @@ def weekly_difference_to_goal(average_value, level):
     Calculate how many more hours a week the person would need to be usable for to
     achieve a utiliztaion target
     """
-    weekly_difference = round((level-average_value * 0.4), 1)
+    weekly_difference = round((level-average_value) * 0.4, 1)
     return str(weekly_difference)
 
 def mean(numbers):
@@ -216,7 +229,11 @@ def write_output(args, user_list, months, today):
             months_to_print = MONTH_NAME_LIST[first_month:] + MONTH_NAME_LIST[:months[1]-1]
         else:
             months_to_print = MONTH_NAME_LIST[months[0]-1+months[1]-1]
-        final_columns = ['Average for last quarter', 'Trend', '60 % Util Hours / Week', '80 % Util - Hours / Week']
+        final_columns = [
+            'Average for last quarter',
+            '60 % Util Hours / Week',
+            '80 % Util - Hours / Week'
+            ]
         header_row = ['Name', 'Position', 'Team', 'Project type'] + months_to_print+final_columns
         writer.writerow(header_row)
         for item in user_list:
@@ -227,7 +244,11 @@ def write_output(args, user_list, months, today):
             writer.writerow(middlelist)
             writer.writerow(bottom)
             writer.writerow(['']*(len(item)+1))
-        print("{} Completed generating the utilization summary. Please view the report in the file {}.".format(PRINT_PREFIX, file_to_write))
+        print("{} Completed generating the utilization summary. Please view the report in the file {}.".format(
+            PRINT_PREFIX,
+            file_to_write
+            )
+             )
 
 def develop_filename(args, today):
     """
