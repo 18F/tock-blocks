@@ -9,6 +9,7 @@ import datetime
 import urllib.request
 import json
 import tock_blocks
+except urllib.HTTPError as HTTPError:
 
 TOCK_API_KEY = os.environ['TOCK_API_KEY']
 
@@ -17,17 +18,7 @@ MONTH_NAME_LIST = ["January", "February", "March",
                    "September", "October", "November", "December"
                   ]
 
-class color:
-    PURPLE = '\033[95m'
-    CYAN = '\033[96m'
-    DARKCYAN = '\033[36m'
-    BLUE = '\033[94m'
-    GREEN = '\033[92m'
-    YELLOW = '\033[93m'
-    RED = '\033[91m'
-    BOLD = '\033[1m'
-    UNDERLINE = '\033[4m'
-    END = '\033[0m'
+PRINT_PREFIX = tock_blocks.Color.PURPLE+"TOCK BLOCKS:"+tock_blocks.Color.END
 
 def all_users_from_file(userfile, args):
     """
@@ -36,16 +27,16 @@ def all_users_from_file(userfile, args):
     data_source = 'api'
     if args.file is not None:
         data_source = args.file
-    print("{}TOCK BLOCKS:{} Generating the utilization report from the data in {}.".format(color.PURPLE, color.END, data_source))
+    print("{} Generating the utilization report from the data in {}.".format(
+        PRINT_PREFIX, data_source))
     users = tock_blocks.read_csv_to_list(userfile)
     today = datetime.date.today()
-    if data_source is not 'api':
+    if data_source != 'api':
         time_entries = tock_blocks.read_csv_to_list(args.file)
     months = find_months(today, args)
     user_list = [0] * len(users)
     for user_index in range(len(users)):
-        print(color.PURPLE+"TOCK BLOCKS:"+color.END +
-              ' Downloading data from tock & processing for {}.'.format(users[user_index][0]))
+        print('{} Downloading data from tock & processing for {}.'.format(PRINT_PREFIX, users[user_index][0]))
         if data_source == 'api':
             time_entries = get_data_from_tock(today, users[user_index][0])
         user_list[user_index] = users[user_index] + \
@@ -69,9 +60,13 @@ def get_data_from_tock(today, tock_user_name):
     headers['Authorization'] = 'token %s' % TOCK_API_KEY
 
     req = urllib.request.Request(url, headers=headers)
-    html = urllib.request.urlopen(req).read()
-    parsed_reponse = json.loads(html.decode("utf-8"))
-    return parsed_reponse
+    try:
+        html = urllib.request.urlopen(req).read()
+        parsed_reponse = json.loads(html.decode("utf-8"))
+        return parsed_reponse
+    except HTTPError:
+        print('Failed to download data for {}'.format(tock_user_name))
+        return
 
 def find_months(today, args):
     """
@@ -79,7 +74,7 @@ def find_months(today, args):
     """
     months = [0, 0]
     if args.beginmonth is None:
-        months[0] = today.month - 2
+        months[0] = today.month - 11
     if args.lastmonth is None:
         months[1] = today.month + 1
     if months[1] == 0:
@@ -99,8 +94,8 @@ def utilization_calculator(user, months, time_entries, today):
     # Calculate each month billable/ utilization / total for that user
     user_values = [0] * (months[1]-months[0])
     array_ind = 0
-    for x in range(months[0], months[1]):
-        start_month = calculate_month_year(x, today)
+    for ind in range(months[0], months[1]):
+        start_month = calculate_month_year(ind, today)
         month_time_entries = tock_blocks.get_entries_in_month(
             start_month+"-01", user_entries
             )
@@ -122,17 +117,17 @@ def calculate_month_year(month_value, today):
     Convert a month index to a string to be supplied in a filter
     """
     year_to_use = today.year
-    x = month_value
+    ind = month_value
     if month_value <= 0:
         year_to_use = year_to_use - 1
-        x = month_value + 12
+        ind = month_value + 12
     start_month = ""
-    if x < 10:
-        start_month = "0"+str(x)
+    if ind < 10:
+        start_month = "0"+str(ind)
     elif month_value == 12:
         start_month = "12"
     else:
-        start_month = str(x)
+        start_month = str(ind)
     start_month = str(year_to_use) + '-' + start_month
     return start_month
 
@@ -221,7 +216,8 @@ def write_output(args, user_list, months, today):
             months_to_print = MONTH_NAME_LIST[first_month:] + MONTH_NAME_LIST[:months[1]-1]
         else:
             months_to_print = MONTH_NAME_LIST[months[0]-1+months[1]-1]
-        header_row = ['Name', 'Position', 'Team', 'Project type'] + months_to_print+['Average for last quarter']
+        final_columns = ['Average for last quarter', 'Trend', '60 % Util Hours / Week', '80 % Util - Hours / Week']
+        header_row = ['Name', 'Position', 'Team', 'Project type'] + months_to_print+final_columns
         writer.writerow(header_row)
         for item in user_list:
             toprow = [item[0], item[1], item[2], 'Billable'] + month_average_and_goal_row(item, 0)
@@ -231,8 +227,7 @@ def write_output(args, user_list, months, today):
             writer.writerow(middlelist)
             writer.writerow(bottom)
             writer.writerow(['']*(len(item)+1))
-        print(color.PURPLE+"TOCK BLOCKS:"+color.END +
-              " Completed generating the utilization summary. Please view the report in the file " + file_to_write + ".")
+        print("{} Completed generating the utilization summary. Please view the report in the file {}.".format(PRINT_PREFIX, file_to_write))
 
 def develop_filename(args, today):
     """

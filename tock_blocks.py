@@ -117,7 +117,10 @@ def blockify_projects(perc_dict):
     blocks.append(other)
     return blocks
 
-class color:
+class Color:
+    """
+    List of command line colors
+    """
     PURPLE = '\033[95m'
     CYAN = '\033[96m'
     DARKCYAN = '\033[36m'
@@ -147,8 +150,8 @@ def print_nice(user_block_list, nice_display):
 def print_handler(text, nice_display, level):
     if nice_display == 'pretty':
         if level == 'bold':
-            return print(color.BOLD+'Other'+color.END)
-        return print(color.PURPLE+text+color.END)
+            return print(Color.BOLD+'Other'+Color.END)
+        return print(Color.PURPLE+text+Color.END)
     if nice_display == 'markdown':
         if level == 'bold':
             return print('*'+text+'*')
