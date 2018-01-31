@@ -180,8 +180,10 @@ def calc_internal_hours(entries):
     Calculates internal utilizable hours from an array of entry dictionaries
     """
     internal_hours = 0.0
+    internal_projects = ["Internal Acq", "Products"]
     for entry in entries:
-        if entry['project_name'][:22] == "TTS Acq / Internal Acq" and not entry['billable']:
+        split_name = entry['project_name'].split("/")
+        if split_name[0].strip() == "TTS Acq" and split_name[1].strip() in internal_projects and not entry['billable']:
             internal_hours = internal_hours + float(entry['hours_spent'])
     return internal_hours
 
